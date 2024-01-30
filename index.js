@@ -43,24 +43,14 @@ function makeVideoPlayer() {
     const player = event.target;
 
     if (event.data === YT.PlayerState.PLAYING) {
-      /*console.log({
-        in: "onPlayerStateChange",
-        playerId: player.id,
-        eventData: event.data,
-        ytPlayerState: YT.PlayerState.PLAYING,
-        players,
-        playersLen: players.length
-      })*/
-
-      for (let i = 0; i < players.length; i++) {
-        const existingPlayer = players[i];
-        window.players = players;
-        console.log({playersLength: players.length, i, existing: existingPlayer, thisPlayer: player.id})
+      players.forEach((existingPlayer) => {
+        // Have to check by id.
+        // Can't compare objects like you were trying to do
         if (existingPlayer.id !== player.id) {
           existingPlayer.pauseVideo();
           console.log("pause");
         }
-      }
+      });
     }
   }
 
