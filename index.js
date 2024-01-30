@@ -151,8 +151,6 @@ function createPlayer(videoWrapper, playerOptions = {}) {
   options.events.onStateChange = handleOnPlayerStateChange;
 
   return ALL_PLAYERS.push(new YT.Player(video, options));
-
-  //return addPlayer_fromMakeVideoPlayer(video, options);
 }
 
 function addYoutubeScriptTagToHTML () {
