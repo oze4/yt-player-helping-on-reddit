@@ -4,16 +4,16 @@
 const myModal = document.querySelector("#myModal");
 myModal.addEventListener("click", modalClickHandler);
 
-const players = [];
-const videoPlayer = makeVideoPlayer();
-const managePlayer = makeManagePlayer();
-const loadPlayer = uiLoadPlayer();
+const ALL_PLAYERS = [];
+const VIDEO_PLAYER = makeVideoPlayer();
+const MANAGE_PLAYER = makeManagePlayer();
+const LOAD_PLAYER = uiLoadPlayer();
 
 function modalClickHandler() {
-  if (players) {
-    players[0].destroy();
+  if (ALL_PLAYERS) {
+    ALL_PLAYERS[0].destroy();
     // you have to remove the player from our global list now
-    players.shift() // this removes first item
+    ALL_PLAYERS.shift() // this removes first item
   }
   console.log("hit");
   myModal.classList.remove("open");
@@ -28,7 +28,7 @@ function makeVideoPlayer() {
   function onPlayerReady(event) {
     const player = event.target;
     player.setVolume(100);
-    if (player === players[0]) {
+    if (ALL_PLAYERS.length && player.id === ALL_PLAYERS[0].id) {
       shufflePlaylist(player);
     }
   }
@@ -43,12 +43,16 @@ function makeVideoPlayer() {
     const player = event.target;
 
     if (event.data === YT.PlayerState.PLAYING) {
-      players.forEach((existingPlayer) => {
+      ALL_PLAYERS.forEach((existingPlayer) => {
         // Have to check by id.
         // Can't compare objects like you were trying to do
         if (existingPlayer.id !== player.id) {
-          existingPlayer.pauseVideo();
-          console.log("pause");
+          // Don't just blindly try to pause.
+          // First make sure the vid is even playing.
+          if (existingPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+            existingPlayer.pauseVideo();
+            console.log("pause");
+          }
         }
       });
     }
@@ -60,7 +64,7 @@ function makeVideoPlayer() {
     playerOptions.events.onReady = onPlayerReady;
     playerOptions.events.onStateChange = onPlayerStateChange;
 
-    players.push(new YT.Player(video, playerOptions));
+    ALL_PLAYERS.push(new YT.Player(video, playerOptions));
     //players.push(player); // Add new player to players array
     //return player;
   }
@@ -100,7 +104,7 @@ function makeManagePlayer() {
   function createPlayer(videoWrapper, playerOptions = {}) {
     const video = videoWrapper.querySelector(".video");
     const options = combinePlayerOptions(defaults, playerOptions);
-    return videoPlayer.addPlayer(video, options);
+    return VIDEO_PLAYER.addPlayer(video, options);
   }
 
   function playerAdder(parent, playerOptions) {
@@ -122,7 +126,7 @@ function makeManagePlayer() {
 function uiLoadPlayer() {
   function addPlayer(playerSelector, playerOptions) {
     const parent = document.getElementById(playerSelector).parentElement;
-    const callback = managePlayer.adder(parent, playerOptions);
+    const callback = MANAGE_PLAYER.adder(parent, playerOptions);
     callback();
   }
 
@@ -132,7 +136,7 @@ function uiLoadPlayer() {
 }
 
 function onYouTubeIframeAPIReady() {
-  loadPlayer.add("ytplayer0", {
+  LOAD_PLAYER.add("ytplayer0", {
     playerVars: {
       loop: 1,
       playlist: "s24NT7TFkUw"
@@ -141,16 +145,16 @@ function onYouTubeIframeAPIReady() {
   const myModal = document.querySelector("#myModal");
   myModal.addEventListener("click", function () {
 
-    loadPlayer.add("ytplayer1", {
+    LOAD_PLAYER.add("ytplayer1", {
       videoId: "CHahce95B1g"
     });
-    loadPlayer.add("ytplayer2", {});
-    loadPlayer.add("ytplayer3", {});
-    loadPlayer.add("ytplayer4", {
+    LOAD_PLAYER.add("ytplayer2", {});
+    LOAD_PLAYER.add("ytplayer3", {});
+    LOAD_PLAYER.add("ytplayer4", {
       playerVars: {
         playlist: "0dgNc5S8cLI,mnfmQe8Mv1g,-Xgi_way56U,CHahce95B1g"
       }
     });
-    loadPlayer.add("ytplayer5", {});
+    LOAD_PLAYER.add("ytplayer5", {});
   });
 }
